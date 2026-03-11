@@ -259,7 +259,7 @@
     <div class="hero-stat"><div class="val" id="h-gmv-uplift">$165K</div><div class="lbl">Annual GMV Uplift</div></div>
     <div class="hero-stat"><div class="val" id="h-roi-y2">5.1×</div><div class="lbl">ROI by Year 2</div></div>
     <div class="hero-stat"><div class="val" id="h-payback">13 mo</div><div class="lbl">Payback Period</div></div>
-    <div class="hero-stat"><div class="val" id="h-net-3yr">$363K</div><div class="lbl">3-Year Net Benefit</div></div>
+    <div class="hero-stat"><div class="val" id="h-hours-freed">138 hrs</div><div class="lbl">Hours Freed / Year</div></div>
   </div>
 </div>
 
@@ -801,10 +801,10 @@
 
     // ── Update DOM ──
     // Hero
-    document.getElementById('h-gmv-uplift').textContent = '$' + Math.round(gmvUplift/1000) + 'K';
-    document.getElementById('h-roi-y2').textContent     = fmtX(roiY2);
-    document.getElementById('h-payback').textContent    = Math.round(paybackMonths) + ' mo';
-    document.getElementById('h-net-3yr').textContent    = '$' + Math.round((netY1+netY2+netY3)/1000) + 'K';
+    document.getElementById('h-gmv-uplift').textContent  = '$' + Math.round(gmvUplift/1000) + 'K';
+    document.getElementById('h-roi-y2').textContent      = fmtX(roiY2);
+    document.getElementById('h-payback').textContent     = Math.round(paybackMonths) + ' mo';
+    document.getElementById('h-hours-freed').textContent = Math.round(hoursFreed) + ' hrs';
 
     // Result cards
     document.getElementById('r-gmv-uplift').textContent  = fmt(gmvUplift);
