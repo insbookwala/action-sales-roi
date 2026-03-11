@@ -293,9 +293,9 @@
           <div class="unit">days</div>
         </div>
         <div class="input-field">
-          <label>Monthly Platform Fee</label>
-          <input type="number" id="platform-fee" value="2300" />
-          <div class="unit">USD / month (Shopify Plus)</div>
+          <label>Shopify Plus Platform Fee</label>
+          <div style="background:var(--gray-light);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px;font-weight:600;color:var(--dark)" id="platform-fee-display">$2,300 / mo</div>
+          <div class="unit">Auto-calculated: max($2,300, 0.18% of monthly GMV)</div>
         </div>
         <div class="input-field">
           <label>Migration & Dev (one-time)</label>
@@ -696,7 +696,6 @@
     const procMin       = +document.getElementById('proc-time').value     || 3;
     const laborHr       = +document.getElementById('labor-cost').value    || 25;
     const workDays      = +document.getElementById('working-days').value  || 365;
-    const platFee       = +document.getElementById('platform-fee').value  || 2300;
     const migCost       = +document.getElementById('migration-cost').value|| 60000;
 
     const selfServePct  = +document.getElementById('self-serve').value    / 100 || 0.10;
@@ -718,8 +717,18 @@
     const hoursFreed      = (selfServeOrders * procMin / 60) * workDays;
     const laborSavings    = hoursFreed * laborHr;
 
-    // Cost
-    const annualPlatform  = platFee * 12;
+    // Platform fee: max($2,300/mo, 0.0018% of monthly GMV)
+    // 0.0018% = 0.000018 as a decimal; written as 0.18% in rate terms = 0.0018
+    // Shopify uses 0.0018 (0.18%) of monthly GMV — kicks in ~$15.3M annual GMV
+    const monthlyGMV      = newGMV / 12;
+    const monthlyPlatform = Math.max(2300, 0.0018 * monthlyGMV);
+    const annualPlatform  = monthlyPlatform * 12;
+
+    // Update platform fee display
+    const feeDisplay = document.getElementById('platform-fee-display');
+    const isPercentBased = monthlyPlatform > 2300;
+    feeDisplay.textContent = fmt(monthlyPlatform) + ' / mo' + (isPercentBased ? ' (% rate active)' : ' (minimum)');
+    feeDisplay.style.color = isPercentBased ? 'var(--blue)' : 'var(--dark)';
 
     // ROI summary
     const annualBenefit   = gmvUplift + laborSavings;
