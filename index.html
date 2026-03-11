@@ -161,6 +161,38 @@
     .metric-card.orange .m-val { color: #b45309; }
     .metric-card.dark { border-top: 3px solid var(--dark); }
 
+    /* ── TOOLTIPS ── */
+    .tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 7px; }
+    .tip-icon {
+      width: 17px; height: 17px; border-radius: 50%;
+      background: #e5e7eb; border: 1px solid #d1d5db;
+      color: #6b7280; font-size: 10px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: help; flex-shrink: 0; user-select: none;
+    }
+    .tip-box {
+      position: absolute; bottom: calc(100% + 10px); left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a; color: #f3f4f6;
+      font-size: 12px; line-height: 1.6; font-weight: 400;
+      padding: 12px 16px; border-radius: 10px;
+      min-width: 260px; max-width: 340px;
+      white-space: normal; opacity: 0; pointer-events: none;
+      transition: opacity .18s; z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .tip-box::after {
+      content: ''; position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 7px solid transparent; border-top-color: #1a1a1a;
+    }
+    .tip-box .tip-row { display: flex; justify-content: space-between; gap: 16px; padding: 2px 0; }
+    .tip-box .tip-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,.08); }
+    .tip-box .tip-lbl { color: #9ca3af; }
+    .tip-box .tip-val { color: #fff; font-weight: 600; white-space: nowrap; }
+    .tip-box .tip-formula { color: #6ee7b7; font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
+    .tip-wrap:hover .tip-box, .tip-wrap:focus-within .tip-box { opacity: 1; }
+
     /* ── ROI TABLE ── */
     .roi-table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -335,27 +367,47 @@
     <div class="metrics-row">
       <div class="metric-card green">
         <div class="m-label">Annual GMV Uplift</div>
-        <div class="m-val" id="r-gmv-uplift">$165,071</div>
+        <div class="tip-wrap">
+          <div class="m-val" id="r-gmv-uplift">$165,071</div>
+          <span class="tip-icon" tabindex="0">i</span>
+          <div class="tip-box" id="tip-gmv-uplift"></div>
+        </div>
         <div class="m-sub">New GMV vs. baseline</div>
       </div>
       <div class="metric-card green">
         <div class="m-label">Labor Savings / Year</div>
-        <div class="m-val" id="r-labor">$3,456</div>
+        <div class="tip-wrap">
+          <div class="m-val" id="r-labor">$3,456</div>
+          <span class="tip-icon" tabindex="0">i</span>
+          <div class="tip-box" id="tip-labor"></div>
+        </div>
         <div class="m-sub" id="r-hours-freed">138 hrs freed per year</div>
       </div>
       <div class="metric-card blue">
         <div class="m-label">Total Annual Benefit</div>
-        <div class="m-val" id="r-total-benefit">$168,527</div>
+        <div class="tip-wrap">
+          <div class="m-val" id="r-total-benefit">$168,527</div>
+          <span class="tip-icon" tabindex="0">i</span>
+          <div class="tip-box" id="tip-total-benefit"></div>
+        </div>
         <div class="m-sub">GMV + labor combined</div>
       </div>
       <div class="metric-card orange">
         <div class="m-label">Payback Period</div>
-        <div class="m-val" id="r-payback">13 mo</div>
+        <div class="tip-wrap">
+          <div class="m-val" id="r-payback">13 mo</div>
+          <span class="tip-icon" tabindex="0">i</span>
+          <div class="tip-box" id="tip-payback"></div>
+        </div>
         <div class="m-sub">Break-even timeline</div>
       </div>
       <div class="metric-card dark">
         <div class="m-label">Year 2 ROI</div>
-        <div class="m-val" id="r-roi-y2">5.1×</div>
+        <div class="tip-wrap">
+          <div class="m-val" id="r-roi-y2">5.1×</div>
+          <span class="tip-icon" tabindex="0">i</span>
+          <div class="tip-box" id="tip-roi-y2"></div>
+        </div>
         <div class="m-sub">Return on investment</div>
       </div>
     </div>
@@ -761,6 +813,41 @@
     document.getElementById('r-total-benefit').textContent= fmt(annualBenefit);
     document.getElementById('r-payback').textContent      = Math.round(paybackMonths) + ' mo';
     document.getElementById('r-roi-y2').textContent       = fmtX(roiY2);
+
+    // ── Tooltips ──
+    const row = (lbl, val) =>
+      `<div class="tip-row"><span class="tip-lbl">${lbl}</span><span class="tip-val">${val}</span></div>`;
+
+    document.getElementById('tip-gmv-uplift').innerHTML =
+      row('New daily orders', newDailyOrders.toFixed(1) + ' orders/day') +
+      row('New avg order value', '$' + newAOV.toFixed(2)) +
+      row('New annual GMV', fmt(newGMV)) +
+      row('Baseline GMV', fmt(baseGMV)) +
+      `<div class="tip-formula">GMV uplift = new daily orders × new AOV × ${workDays} days − baseline GMV</div>`;
+
+    document.getElementById('tip-labor').innerHTML =
+      row('Self-serve orders/day', selfServeOrders.toFixed(1)) +
+      row('Processing time/order', procMin + ' min') +
+      row('Annual hours freed', Math.round(hoursFreed) + ' hrs') +
+      row('Labor rate', '$' + laborHr + '/hr') +
+      `<div class="tip-formula">Savings = (self-serve orders × ${procMin} min ÷ 60) × ${workDays} days × $${laborHr}/hr</div>`;
+
+    document.getElementById('tip-total-benefit').innerHTML =
+      row('Annual GMV uplift', fmt(gmvUplift)) +
+      row('Annual labor savings', fmt(laborSavings)) +
+      `<div class="tip-formula">Total benefit = GMV uplift + labor savings</div>`;
+
+    document.getElementById('tip-payback').innerHTML =
+      row('Year 1 total cost', fmt(costY1)) +
+      row('Monthly benefit', fmt(annualBenefit / 12)) +
+      row('Payback', Math.round(paybackMonths) + ' months') +
+      `<div class="tip-formula">Payback = Y1 cost ÷ (annual benefit ÷ 12)</div>`;
+
+    document.getElementById('tip-roi-y2').innerHTML =
+      row('Y2 net benefit', fmt(netY2)) +
+      row('Y2 platform cost', fmt(costY2)) +
+      row('Y2 ROI', fmtX(roiY2)) +
+      `<div class="tip-formula">ROI = net benefit ÷ total cost (Y1 includes $${Math.round(migCost/1000)}K migration)</div>`;
 
     // Table
     document.getElementById('t-gmv-1').textContent      = fmt(gmvUplift);
