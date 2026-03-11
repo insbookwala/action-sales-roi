@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Action Sales × Shopify B2B — ROI Model</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --green: #008060;
+      --green-light: #e3f5f0;
+      --green-mid: #00a67e;
+      --dark: #1a1a1a;
+      --gray: #6b7280;
+      --gray-light: #f4f6f8;
+      --border: #e5e7eb;
+      --white: #ffffff;
+      --yellow: #fef3c7;
+      --yellow-border: #f59e0b;
+      --red: #dc2626;
+      --blue: #1d4ed8;
+      --radius: 12px;
+      --shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f7f8fa;
+      color: var(--dark);
+      line-height: 1.5;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--dark);
+      color: #fff;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: -.3px; }
+    .logo svg { width: 28px; height: 28px; }
+    .badge { background: var(--green); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: .4px; text-transform: uppercase; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { color: #9ca3af; text-decoration: none; font-size: 13px; transition: color .2s; }
+    .nav-links a:hover { color: #fff; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0d1f17 0%, #0a3d28 60%, #004d35 100%);
+      color: #fff;
+      padding: 80px 32px 72px;
+      text-align: center;
+    }
+    .hero-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #6ee7b7; margin-bottom: 14px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { color: #34d399; }
+    .hero p { font-size: 17px; color: #a7f3d0; max-width: 540px; margin: 0 auto 36px; }
+    .hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+    .hero-stat { text-align: center; }
+    .hero-stat .val { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+    .hero-stat .lbl { font-size: 12px; color: #6ee7b7; font-weight: 600; letter-spacing: .5px; margin-top: 2px; }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; display: grid; gap: 32px; }
+
+    /* ── SECTION LABEL ── */
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 28px 32px;
+    }
+    .card-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .card-sub { font-size: 13px; color: var(--gray); margin-bottom: 24px; }
+
+    /* ── INPUT GRID ── */
+    .input-note {
+      background: var(--yellow);
+      border: 1px solid var(--yellow-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .inputs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .input-field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 6px; letter-spacing: .3px; }
+    .input-field input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--dark);
+      background: var(--yellow);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    .input-field input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,128,96,.12); }
+    .input-field .unit { font-size: 11px; color: var(--gray); margin-top: 4px; }
+    .uplift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+    .uplift-item {
+      background: var(--gray-light);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .uplift-item label { font-size: 11px; font-weight: 600; color: var(--gray); display: block; margin-bottom: 6px; }
+    .uplift-item input {
+      width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px;
+      font-size: 14px; font-weight: 600; background: var(--yellow); outline: none;
+      transition: border-color .2s;
+    }
+    .uplift-item input:focus { border-color: var(--green); }
+    .recalc-btn {
+      margin-top: 24px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: block;
+    }
+    .recalc-btn:hover { background: var(--green-mid); }
+    .recalc-btn:active { transform: scale(.98); }
+
+    /* ── METRICS ROW ── */
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .metric-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+    }
+    .metric-card .m-label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .metric-card .m-val { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+    .metric-card .m-sub { font-size: 12px; color: var(--gray); margin-top: 4px; }
+    .metric-card.green { border-top: 3px solid var(--green); }
+    .metric-card.green .m-val { color: var(--green); }
+    .metric-card.blue { border-top: 3px solid var(--blue); }
+    .metric-card.blue .m-val { color: var(--blue); }
+    .metric-card.orange { border-top: 3px solid #f59e0b; }
+    .metric-card.orange .m-val { color: #b45309; }
+    .metric-card.dark { border-top: 3px solid var(--dark); }
+
+    /* ── ROI TABLE ── */
+    .roi-table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th { background: var(--gray-light); padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray); }
+    thead th:not(:first-child) { text-align: left; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 12px 16px; }
+    tbody td:not(:first-child) { text-align: left; font-weight: 500; font-size: 13px; }
+    tbody tr.subtotal td { background: var(--gray-light); font-weight: 700; }
+    tbody tr.highlight td { background: var(--green-light); color: var(--green); font-weight: 800; font-size: 15px; }
+    tbody tr.cost td { color: var(--red); }
+    .roi-badge { display: inline-block; background: var(--green); color: #fff; border-radius: 6px; padding: 2px 8px; font-size: 13px; font-weight: 700; }
+    .roi-badge.dim { background: #fef3c7; color: #92400e; }
+    .roi-summary-table td:not(:first-child) { text-align: right !important; font-weight: 600 !important; font-size: 14px !important; }
+    .roi-summary-table th:not(:first-child) { text-align: right !important; }
+
+    /* ── CHART CARDS ── */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 680px) { .charts-grid { grid-template-columns: 1fr; } .uplift-grid { grid-template-columns: 1fr; } }
+    .chart-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; }
+    .chart-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .chart-card p { font-size: 12px; color: var(--gray); margin-bottom: 20px; }
+    .chart-wrap { position: relative; height: 220px; }
+
+    /* ── DRIVER LIST ── */
+    .drivers-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .driver-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); }
+    .driver-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--green-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+    .driver-text .dt { font-size: 14px; font-weight: 700; }
+    .driver-text .ds { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .driver-text .dv { font-size: 16px; font-weight: 800; color: var(--green); margin-top: 4px; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--dark); color: #6b7280; text-align: center; padding: 24px; font-size: 12px; }
+    footer a { color: #9ca3af; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 109 124" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M74.7 14.8C74.5 13.5 73.4 12.6 72.1 12.6C72 12.6 64.2 12.7 64.2 12.7C64.2 12.7 57.5 6.2 56.8 5.5C56.1 4.8 54.8 5 54.3 5.1L50.9 6.1C50.1 3.8 48.8 1.7 46.7 0.2C40.2 -4.2 32.2 1 29 8.6L13.2 13.7C12.1 14.1 11.9 14.2 11.7 15.3L0.2 100.8L56.5 112L108.7 100.6L74.7 14.8ZM50.4 8.2L38.2 11.9C40.3 6.9 44.1 4 47.7 4C49.3 4 50.4 4.6 50.4 4.6V8.2ZM34.3 10L49.1 5.4C47.8 6.8 46.9 9.1 46.5 12L33.9 15.9C35.6 12.1 35.3 11.3 34.3 10ZM53.7 67.1C53.4 75 49.1 79.1 43.5 79.1C37.6 79.1 34.8 75.2 34.8 70.3C34.8 65.6 37.8 62.4 43.2 62.4C45.2 62.4 46.8 62.7 48.3 63.3V56.1C46.7 55.9 44.8 55.7 42.8 55.7C31.4 55.7 24.4 62 24.4 70.8C24.4 79.7 30.4 85.5 41.4 85.5C53.1 85.5 60.2 78.6 60.2 67.8V38.5H53.7V67.1Z" fill="#96BF48"/>
+    </svg>
+    Action Sales × Shopify B2B
+    <span class="badge">ROI Model</span>
+  </div>
+  <nav class="nav-links">
+    <a href="#benchmarks">Benchmarks</a>
+    <a href="#inputs">Inputs</a>
+    <a href="#results">Results</a>
+    <a href="#roi-table">3-Year View</a>
+    <a href="#qual-drivers">Qualitative</a>
+    <a href="#competitive">Competitive</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Shopify B2B · ROI Analysis</div>
+  <h1>From Manual Orders<br>to <span>Scalable Revenue</span></h1>
+  <p>See exactly how Shopify B2B pays off — modeled on real operational inputs for your account.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val" id="h-gmv-uplift">$165K</div><div class="lbl">Annual GMV Uplift</div></div>
+    <div class="hero-stat"><div class="val" id="h-roi-y2">5.1×</div><div class="lbl">ROI by Year 2</div></div>
+    <div class="hero-stat"><div class="val" id="h-payback">13 mo</div><div class="lbl">Payback Period</div></div>
+    <div class="hero-stat"><div class="val" id="h-net-3yr">$363K</div><div class="lbl">3-Year Net Benefit</div></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- UPLIFT BENCHMARKS -->
+  <div id="benchmarks">
+    <div class="section-label">Shopify B2B — Benchmark Uplift Metrics</div>
+    <div class="card" style="background:linear-gradient(135deg,#0d1f17,#0a3d28);border-color:#1a5c3e;color:#fff">
+      <div class="card-title" style="color:#fff;margin-bottom:6px">What Shopify B2B delivers — across customers</div>
+      <div class="card-sub" style="color:#a7f3d0;margin-bottom:24px">These industry benchmarks are the basis for the conservative model inputs below. We apply a fraction of these figures to keep projections credible.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:20px 22px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6ee7b7;margin-bottom:8px">Self-Serve Adoption</div>
+          <div style="font-size:40px;font-weight:800;letter-spacing:-2px;color:#34d399">33%</div>
+          <div style="font-size:13px;color:#a7f3d0;margin-top:6px">of orders shift to self-serve <strong style="color:#fff">within 6 months</strong> of go-live</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:20px 22px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6ee7b7;margin-bottom:8px">Reorder Frequency</div>
+          <div style="font-size:40px;font-weight:800;letter-spacing:-2px;color:#34d399">22%</div>
+          <div style="font-size:13px;color:#a7f3d0;margin-top:6px">increase in reorder frequency driven by <strong style="color:#fff">frictionless checkout</strong></div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:20px 22px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6ee7b7;margin-bottom:8px">GMV per Buyer (AOV)</div>
+          <div style="font-size:40px;font-weight:800;letter-spacing:-2px;color:#34d399">20%</div>
+          <div style="font-size:13px;color:#a7f3d0;margin-top:6px">increase in GMV per buyer via <strong style="color:#fff">product discovery & cross-sell</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUTS -->
+  <div id="inputs">
+    <div class="section-label">Step 2 — Business Inputs</div>
+    <div class="card">
+      <div class="card-title">Current State</div>
+      <div class="card-sub">Edit the yellow cells below to model any account.</div>
+      <div class="input-note">✏️ <strong>Example client: Panda Express</strong> — Replace these values with your prospect's numbers.</div>
+      <div class="inputs-grid">
+        <div class="input-field">
+          <label>Daily Orders</label>
+          <input type="number" id="daily-orders" value="75" />
+          <div class="unit">orders / day</div>
+        </div>
+        <div class="input-field">
+          <label>Avg Order Value</label>
+          <input type="number" id="aov" value="300" />
+          <div class="unit">USD</div>
+        </div>
+        <div class="input-field">
+          <label>Manual Processing Time</label>
+          <input type="number" id="proc-time" value="3" />
+          <div class="unit">minutes / order</div>
+        </div>
+        <div class="input-field">
+          <label>Internal Labor Cost</label>
+          <input type="number" id="labor-cost" value="25" />
+          <div class="unit">USD / hour</div>
+        </div>
+        <div class="input-field">
+          <label>Working Days / Year</label>
+          <input type="number" id="working-days" value="365" />
+          <div class="unit">days</div>
+        </div>
+        <div class="input-field">
+          <label>Monthly Platform Fee</label>
+          <input type="number" id="platform-fee" value="2300" />
+          <div class="unit">USD / month (Shopify Plus)</div>
+        </div>
+        <div class="input-field">
+          <label>Migration & Dev (one-time)</label>
+          <input type="number" id="migration-cost" value="60000" />
+          <div class="unit">USD</div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px">
+        <div class="card-title" style="font-size:15px">Shopify Uplift Assumptions <span style="font-size:12px;font-weight:400;color:var(--gray)">(conservative)</span></div>
+        <div class="uplift-grid">
+          <div class="uplift-item">
+            <label>Self-Serve Adoption</label>
+            <input type="number" id="self-serve" value="10" step="1" />
+            <div class="unit" style="font-size:11px;color:var(--gray);margin-top:4px">% of orders → self-serve</div>
+          </div>
+          <div class="uplift-item">
+            <label>Reorder Frequency Uplift</label>
+            <input type="number" id="reorder-freq" value="1" step="0.5" />
+            <div class="unit" style="font-size:11px;color:var(--gray);margin-top:4px">% increase in orders/day</div>
+          </div>
+          <div class="uplift-item">
+            <label>AOV Uplift</label>
+            <input type="number" id="aov-uplift" value="1" step="0.5" />
+            <div class="unit" style="font-size:11px;color:var(--gray);margin-top:4px">% increase in avg order value</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="recalc-btn" onclick="recalculate()">Recalculate ROI →</button>
+    </div>
+  </div>
+
+  <!-- KEY RESULTS -->
+  <div id="results">
+    <div class="section-label">Step 3 — Results at a Glance</div>
+    <div class="metrics-row">
+      <div class="metric-card green">
+        <div class="m-label">Annual GMV Uplift</div>
+        <div class="m-val" id="r-gmv-uplift">$165,071</div>
+        <div class="m-sub">New GMV vs. baseline</div>
+      </div>
+      <div class="metric-card green">
+        <div class="m-label">Labor Savings / Year</div>
+        <div class="m-val" id="r-labor">$3,456</div>
+        <div class="m-sub" id="r-hours-freed">138 hrs freed per year</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="m-label">Total Annual Benefit</div>
+        <div class="m-val" id="r-total-benefit">$168,527</div>
+        <div class="m-sub">GMV + labor combined</div>
+      </div>
+      <div class="metric-card orange">
+        <div class="m-label">Payback Period</div>
+        <div class="m-val" id="r-payback">13 mo</div>
+        <div class="m-sub">Break-even timeline</div>
+      </div>
+      <div class="metric-card dark">
+        <div class="m-label">Year 2 ROI</div>
+        <div class="m-val" id="r-roi-y2">5.1×</div>
+        <div class="m-sub">Return on investment</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Net Benefit Over 3 Years</h3>
+      <p>Cumulative net benefit after all costs</p>
+      <div class="chart-wrap"><canvas id="chartBenefit"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Revenue Breakdown</h3>
+      <p>Current GMV vs. projected with Shopify B2B</p>
+      <div class="chart-wrap"><canvas id="chartGMV"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 3-YEAR ROI TABLE -->
+  <div id="roi-table">
+    <div class="section-label">Step 4 — 3-Year ROI Summary</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="roi-table-wrap">
+        <table class="roi-summary-table">
+          <thead>
+            <tr>
+              <th>Line Item</th>
+              <th>Year 1</th>
+              <th>Year 2</th>
+              <th>Year 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Annual GMV Uplift</td>
+              <td id="t-gmv-1">$165,071</td>
+              <td id="t-gmv-2">$165,071</td>
+              <td id="t-gmv-3">$165,071</td>
+            </tr>
+            <tr>
+              <td>Annual Labor Savings</td>
+              <td id="t-labor-1">$3,456</td>
+              <td id="t-labor-2">$3,456</td>
+              <td id="t-labor-3">$3,456</td>
+            </tr>
+            <tr class="subtotal">
+              <td>Total Annual Benefit</td>
+              <td id="t-benefit-1">$168,527</td>
+              <td id="t-benefit-2">$168,527</td>
+              <td id="t-benefit-3">$168,527</td>
+            </tr>
+            <tr class="cost">
+              <td>Shopify Annual Platform Cost</td>
+              <td id="t-platform-1">$27,600</td>
+              <td id="t-platform-2">$27,600</td>
+              <td id="t-platform-3">$27,600</td>
+            </tr>
+            <tr class="cost">
+              <td>One-Time Migration (Year 1 only)</td>
+              <td id="t-migration">$60,000</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr class="subtotal cost">
+              <td>Total Cost</td>
+              <td id="t-cost-1">$87,600</td>
+              <td id="t-cost-2">$27,600</td>
+              <td id="t-cost-3">$27,600</td>
+            </tr>
+            <tr class="highlight">
+              <td>Net Benefit</td>
+              <td id="t-net-1">$80,927</td>
+              <td id="t-net-2">$140,927</td>
+              <td id="t-net-3">$140,927</td>
+            </tr>
+            <tr>
+              <td>ROI on Investment</td>
+              <td><span class="roi-badge dim" id="t-roi-1">0.9×</span></td>
+              <td><span class="roi-badge" id="t-roi-2">5.1×</span></td>
+              <td><span class="roi-badge" id="t-roi-3">5.1×</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUALITATIVE ROI DRIVERS -->
+  <div id="qual-drivers">
+    <div class="section-label">Qualitative ROI Drivers</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="roi-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:24%">Driver</th>
+              <th style="width:38%">TODAY — Current State</th>
+              <th style="width:38%">WITH SHOPIFY — The Gain</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700">Scalable Growth Without Linear Headcount</td>
+              <td style="color:var(--gray)">The only lever is to hire more people — linear, expensive, and hard to justify.</td>
+              <td style="color:var(--green);font-weight:500">Self-serve ordering absorbs volume without adding headcount. The same team can manage more accounts at higher revenue.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">The Long Tail is Currently Untapped</td>
+              <td style="color:var(--gray)">Mom-and-pop accounts are deprioritized because reps have no capacity to onboard and manage them. That revenue is left on the table.</td>
+              <td style="color:var(--green);font-weight:500">Self-serve unlocks a new buyer segment that requires zero rep time to transact — turning overlooked accounts into a compounding revenue stream.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">Every Order is a Manual Error Risk</td>
+              <td style="color:var(--gray)">Orders arrive by email, are cross-referenced against inventory manually, and re-keyed into the ERP. Each touchpoint is a chance for a mistake, a delay, or a lost order.</td>
+              <td style="color:var(--green);font-weight:500">Orders flow directly from the portal into the ERP via API — eliminating re-keying, reducing errors, and giving customers real-time confirmation.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">Competitive Risk of Inaction</td>
+              <td style="color:var(--gray)">Chains are actively requesting online ordering. Every month without a portal is a reason for them to look elsewhere.</td>
+              <td style="color:var(--green);font-weight:500">A live B2B portal becomes a reason to win and retain chain accounts that are evaluating whether Action Sales can scale with them.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">Human Touch, Amplified — Not Replaced</td>
+              <td style="color:var(--gray)">Reps spend the bulk of their time processing repeat orders — transactional work that adds no relationship value and crowds out consultative selling.</td>
+              <td style="color:var(--green);font-weight:500">Reps are freed to focus on cross-selling, relationship building, and landing new accounts — the work that actually drives revenue and retention.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPETITIVE ANALYSIS -->
+  <div id="competitive">
+    <div class="section-label">Competitive Analysis</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="roi-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Key Decision Factor</th>
+              <th style="background:#e3f5f0;color:var(--green)">Shopify Plus ✓</th>
+              <th>Magento (Adobe Commerce)</th>
+              <th>BigCommerce B2B</th>
+              <th>Infor Rhythm</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600">Time to Launch</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">2–4 months</td>
+              <td>9–18 months</td>
+              <td>4–8 months</td>
+              <td style="color:var(--gray)">—</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">B2B Feature Depth</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">Native &amp; complete</td>
+              <td>Heavy customization required</td>
+              <td>Moderate, still maturing</td>
+              <td>Basic — ERP-centric only</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Infor ERP Integration</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">Via API (agency partners available)</td>
+              <td>Custom build required</td>
+              <td>Limited connectors</td>
+              <td style="color:#b45309;font-weight:600">Native — only advantage</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">IT Dependency</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">Low — business user friendly</td>
+              <td>Very high</td>
+              <td>Moderate</td>
+              <td>Very high — requires Infor specialists</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Buyer UX / Self-Serve Quality</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">Consumer-grade</td>
+              <td>Depends on customization spend</td>
+              <td>Good</td>
+              <td>IT/ERP-grade — not buyer friendly</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">Scalability</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">High</td>
+              <td>High but expensive</td>
+              <td>Moderate</td>
+              <td>Locked to Infor ecosystem</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">D2C Expansion Path</td>
+              <td style="background:#f0faf6;font-weight:700;color:var(--green)">Included in Plus</td>
+              <td>Yes, costly</td>
+              <td>Yes</td>
+              <td style="color:var(--red);font-weight:600">No</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE DRIVERS -->
+  <div id="drivers">
+    <div class="section-label">Value Drivers</div>
+    <div class="drivers-list">
+      <div class="driver-item">
+        <div class="driver-icon">🛒</div>
+        <div class="driver-text">
+          <div class="dt">Self-Serve Order Adoption</div>
+          <div class="ds">Buyers place their own orders through the B2B portal — reducing sales rep workload and enabling 24/7 ordering.</div>
+          <div class="dv" id="d-self-serve" style="display:none"></div>
+        </div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-icon">🔁</div>
+        <div class="driver-text">
+          <div class="dt">Reorder Frequency Uplift</div>
+          <div class="ds">Easier reordering on a B2B storefront drives more frequent purchases without additional sales effort.</div>
+          <div class="dv" id="d-reorder" style="display:none"></div>
+        </div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-icon">📈</div>
+        <div class="driver-text">
+          <div class="dt">AOV Uplift</div>
+          <div class="ds">Product discovery, curated catalogs, and cross-sell recommendations increase average basket size.</div>
+          <div class="dv" id="d-aov" style="display:none"></div>
+        </div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-icon">⏱️</div>
+        <div class="driver-text">
+          <div class="dt">Labor Hours Freed</div>
+          <div class="ds">Every order that goes self-serve eliminates manual processing time your team spends on data entry and follow-up.</div>
+          <div class="dv" id="d-hours" style="display:none"></div>
+        </div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-icon">💳</div>
+        <div class="driver-text">
+          <div class="dt">Flexible Net Terms & Invoicing</div>
+          <div class="ds">Built-in net payment terms and automated invoicing reduce accounts receivable friction and accelerate cash flow.</div>
+        </div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-icon">🏗️</div>
+        <div class="driver-text">
+          <div class="dt">Scalable Without Headcount</div>
+          <div class="ds">Shopify B2B grows with your buyer base — no need to hire ops staff as order volume increases.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>Prepared by <strong style="color:#fff">Action Sales</strong> in partnership with <strong style="color:#96bf48">Shopify B2B</strong> &nbsp;·&nbsp; For discussion purposes only &nbsp;·&nbsp; <a href="https://www.shopify.com/plus/b2b">Learn more at shopify.com/plus/b2b</a></p>
+</footer>
+
+<script>
+  // ── Formatting helpers ──────────────────────────────
+  const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const fmtX = (n) => n.toFixed(1) + '×';
+
+  // ── Chart refs ──────────────────────────────────────
+  let chartBenefit, chartGMV;
+
+  function buildCharts(data) {
+    const { netY1, netY2, netY3, baseGMV, newGMV } = data;
+
+    // Destroy old charts
+    if (chartBenefit) chartBenefit.destroy();
+    if (chartGMV) chartGMV.destroy();
+
+    const gridColor = 'rgba(0,0,0,.06)';
+    const green = '#008060';
+    const greenLight = 'rgba(0,128,96,.12)';
+
+    chartBenefit = new Chart(document.getElementById('chartBenefit'), {
+      type: 'bar',
+      data: {
+        labels: ['Year 1', 'Year 2', 'Year 3'],
+        datasets: [{
+          label: 'Net Benefit',
+          data: [netY1, netY2, netY3],
+          backgroundColor: [
+            netY1 >= 0 ? green : '#dc2626',
+            green, green
+          ],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: gridColor } },
+          y: {
+            grid: { color: gridColor },
+            ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }
+          }
+        }
+      }
+    });
+
+    chartGMV = new Chart(document.getElementById('chartGMV'), {
+      type: 'bar',
+      data: {
+        labels: ['Current GMV', 'Projected GMV'],
+        datasets: [{
+          data: [baseGMV, newGMV],
+          backgroundColor: ['#e5e7eb', green],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: gridColor } },
+          y: {
+            grid: { color: gridColor },
+            ticks: { callback: v => '$' + (v/1000000).toFixed(2) + 'M' }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Core calculation ────────────────────────────────
+  function recalculate() {
+    const dailyOrders   = +document.getElementById('daily-orders').value  || 75;
+    const aov           = +document.getElementById('aov').value           || 300;
+    const procMin       = +document.getElementById('proc-time').value     || 3;
+    const laborHr       = +document.getElementById('labor-cost').value    || 25;
+    const workDays      = +document.getElementById('working-days').value  || 365;
+    const platFee       = +document.getElementById('platform-fee').value  || 2300;
+    const migCost       = +document.getElementById('migration-cost').value|| 60000;
+
+    const selfServePct  = +document.getElementById('self-serve').value    / 100 || 0.10;
+    const reorderPct    = +document.getElementById('reorder-freq').value  / 100 || 0.01;
+    const aovPct        = +document.getElementById('aov-uplift').value    / 100 || 0.01;
+
+    // Baseline
+    const baseGMV         = dailyOrders * aov * workDays;
+    const annualManHours  = (dailyOrders * procMin / 60) * workDays;
+    const annualLaborCost = annualManHours * laborHr;
+
+    // With Shopify
+    const newDailyOrders  = dailyOrders * (1 + reorderPct);
+    const newAOV          = aov * (1 + aovPct);
+    const newGMV          = newDailyOrders * newAOV * workDays;
+    const gmvUplift       = newGMV - baseGMV;
+
+    const selfServeOrders = dailyOrders * selfServePct;
+    const hoursFreed      = (selfServeOrders * procMin / 60) * workDays;
+    const laborSavings    = hoursFreed * laborHr;
+
+    // Cost
+    const annualPlatform  = platFee * 12;
+
+    // ROI summary
+    const annualBenefit   = gmvUplift + laborSavings;
+
+    const costY1 = annualPlatform + migCost;
+    const costY2 = annualPlatform;
+    const costY3 = annualPlatform;
+
+    const netY1 = annualBenefit - costY1;
+    const netY2 = annualBenefit - costY2;
+    const netY3 = annualBenefit - costY3;
+
+    const roiY1 = netY1 / costY1;
+    const roiY2 = netY2 / costY2;
+    const roiY3 = netY3 / costY3;
+
+    const paybackMonths = costY1 / (annualBenefit / 12);
+
+    // ── Update DOM ──
+    // Hero
+    document.getElementById('h-gmv-uplift').textContent = '$' + Math.round(gmvUplift/1000) + 'K';
+    document.getElementById('h-roi-y2').textContent     = fmtX(roiY2);
+    document.getElementById('h-payback').textContent    = Math.round(paybackMonths) + ' mo';
+    document.getElementById('h-net-3yr').textContent    = '$' + Math.round((netY1+netY2+netY3)/1000) + 'K';
+
+    // Result cards
+    document.getElementById('r-gmv-uplift').textContent  = fmt(gmvUplift);
+    document.getElementById('r-labor').textContent        = fmt(laborSavings);
+    document.getElementById('r-hours-freed').textContent  = Math.round(hoursFreed) + ' hrs freed per year';
+    document.getElementById('r-total-benefit').textContent= fmt(annualBenefit);
+    document.getElementById('r-payback').textContent      = Math.round(paybackMonths) + ' mo';
+    document.getElementById('r-roi-y2').textContent       = fmtX(roiY2);
+
+    // Table
+    document.getElementById('t-gmv-1').textContent      = fmt(gmvUplift);
+    document.getElementById('t-gmv-2').textContent      = fmt(gmvUplift);
+    document.getElementById('t-gmv-3').textContent      = fmt(gmvUplift);
+    document.getElementById('t-labor-1').textContent    = fmt(laborSavings);
+    document.getElementById('t-labor-2').textContent    = fmt(laborSavings);
+    document.getElementById('t-labor-3').textContent    = fmt(laborSavings);
+    document.getElementById('t-benefit-1').textContent  = fmt(annualBenefit);
+    document.getElementById('t-benefit-2').textContent  = fmt(annualBenefit);
+    document.getElementById('t-benefit-3').textContent  = fmt(annualBenefit);
+    document.getElementById('t-platform-1').textContent = fmt(annualPlatform);
+    document.getElementById('t-platform-2').textContent = fmt(annualPlatform);
+    document.getElementById('t-platform-3').textContent = fmt(annualPlatform);
+    document.getElementById('t-migration').textContent  = fmt(migCost);
+    document.getElementById('t-cost-1').textContent     = fmt(costY1);
+    document.getElementById('t-cost-2').textContent     = fmt(costY2);
+    document.getElementById('t-cost-3').textContent     = fmt(costY3);
+    document.getElementById('t-net-1').textContent      = fmt(netY1);
+    document.getElementById('t-net-2').textContent      = fmt(netY2);
+    document.getElementById('t-net-3').textContent      = fmt(netY3);
+
+    const roi1El = document.getElementById('t-roi-1');
+    roi1El.textContent = fmtX(roiY1);
+    roi1El.className = roiY1 >= 1 ? 'roi-badge' : 'roi-badge dim';
+    document.getElementById('t-roi-2').textContent = fmtX(roiY2);
+    document.getElementById('t-roi-3').textContent = fmtX(roiY3);
+
+    // Drivers
+    document.getElementById('d-self-serve').textContent = (selfServeOrders).toFixed(1) + ' orders/day automated';
+    document.getElementById('d-reorder').textContent    = '+' + (dailyOrders * reorderPct).toFixed(2) + ' orders/day';
+    document.getElementById('d-aov').textContent        = '$' + aov + ' → $' + newAOV.toFixed(0);
+    document.getElementById('d-hours').textContent      = Math.round(hoursFreed) + ' hours reclaimed / year';
+
+    // Charts
+    buildCharts({ netY1, netY2, netY3, baseGMV, newGMV });
+  }
+
+  // ── Run on load ─────────────────────────────────────
+  recalculate();
+</script>
+</body>
+</html>
