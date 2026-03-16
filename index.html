@@ -819,7 +819,7 @@
       `<div class="tip-row"><span class="tip-lbl">${lbl}</span><span class="tip-val">${val}</span></div>`;
 
     document.getElementById('tip-gmv-uplift').innerHTML =
-      row('New daily orders', newDailyOrders.toFixed(1) + ' orders/day') +
+      row('New daily orders', newDailyOrders.toFixed(2) + ' orders/day') +
       row('New avg order value', '$' + newAOV.toFixed(2)) +
       row('New annual GMV', fmt(newGMV)) +
       row('Baseline GMV', fmt(baseGMV)) +
